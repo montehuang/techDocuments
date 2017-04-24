@@ -202,7 +202,7 @@ CCRenderer.cpp
 
 void Renderer::addCommand(RenderCommand* command)
 {
-    int renderQueue =_commandGroupStack.top(); //std::stack<int> _commandGroupStack; _commandGroupStack是一个栈，每增加一个GroupCommand，_commandGroupStack.push一次，通过Renderer::pushGroup
+    int renderQueue =_commandGroupStack.top(); //std::stack<int> _commandGroupStack; _commandGroupStack是一个栈，每增加一个GroupCommand，_commandGroupStack.push一次，通过Renderer::pushGroup。同一组的renderCommand放在一组pushGroup和popGroup之间，而它们的key值保留在相应的GroupCommand的_renderQueueID里面
     addCommand(command, renderQueue);
 }
 
@@ -347,10 +347,10 @@ void Renderer::processRenderCommand(RenderCommand* command)//根据command的类
             cmd->batchDraw();
         }
     }
-    else if(RenderCommand::Type::GROUP_COMMAND == commandType){
+    else if(RenderCommand::Type::GROUP_COMMAND == commandType){ //类型为GROUP_COMMAND
         flush();
         int renderQueueID = ((GroupCommand*) command)->getRenderQueueID();
-        visitRenderQueue(_renderGroups[renderQueueID]);
+        visitRenderQueue(_renderGroups[renderQueueID]);//根据GroupCommand的renderQueueID值到_renderGroups里面进行索引，在进行依次的渲染，而GroupCommand本身并没有渲染工作
     }
     else if(RenderCommand::Type::CUSTOM_COMMAND == commandType){
         flush();
